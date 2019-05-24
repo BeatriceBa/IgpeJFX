@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -41,8 +42,8 @@ public class Menu {
 	Database storage = new Database();
 	
 	//Other
-	int windowWidth = 800;
-	int windowHeight = 600;
+	int windowWidth;
+	int windowHeight;
 	int iconSize = 150;
 	int buttonSize = 80;
 	int panelWidth = 400;
@@ -85,8 +86,17 @@ public class Menu {
 	//Once the "sub-panels" are created, we create the main panel, which is a splitPane
 	JSplitPane splitPanel = new JSplitPane (JSplitPane.HORIZONTAL_SPLIT, leftPanel, tabbedPanel);
 	
-    ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList() ;
-    Map <String,Integer> mostWantedModel;
+    ObservableList<PieChart.Data> pieChartModelData = FXCollections.observableArrayList() ;
+    Map <String,Integer> modelMap;
+    PieChart chartModel;
+    
+    ObservableList<PieChart.Data> pieChartCategoryData = FXCollections.observableArrayList() ;
+    Map <String,Integer> categoryMap;
+    PieChart chartCategory;
+    
+    ObservableList<PieChart.Data> pieChartCustomerData = FXCollections.observableArrayList() ;
+    Map <String,Integer> customerMap;
+    PieChart chartCustomer;
 
 	public static void main(String[] args) {	
 		try {
@@ -108,7 +118,14 @@ public class Menu {
 	 */
 	public Menu() {
 		
-		f.setSize(windowWidth, windowHeight);
+		//f.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		windowWidth = dim.width;
+		windowHeight = dim.height - 30;
+		f.setSize(new Dimension(windowWidth, windowHeight));
+
+		f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 						
@@ -140,6 +157,9 @@ public class Menu {
 		JPanel description = new JPanel();
 		JPanel photo = new JPanel();
 		JSplitPane overall = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, photo, description);
+		
+		description.setBackground(Color.WHITE);
+		photo.setBackground(Color.WHITE);
 		
 		JButton sell = new JButton("Sell");
 		sell.addActionListener(new BuyProductFromCatalogAction(this,p));
@@ -183,6 +203,10 @@ public class Menu {
 		JPanel description = new JPanel();
 		JPanel photo = new JPanel();
 		JSplitPane overall = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, photo, description);
+		
+		description.setBackground(Color.WHITE);
+		photo.setBackground(Color.WHITE);
+		
 		
 		//Image resize
 		ImageIcon icon = new ImageIcon(s.getImagePath());
@@ -250,27 +274,14 @@ public class Menu {
 	 * Sets various parameters for each panel.
 	 */
 	private void initPanels() {
-		Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	GridPane grid = new GridPane();
-                Scene scene = new Scene(grid, 800, 400);
-                
-                mostWantedModel = storage.mostWantedFromSale("model");
-                
-                for(Map.Entry<String, Integer> entry: mostWantedModel.entrySet()) {
-                	pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                PieChart chart = new PieChart(pieChartData);
-                chart.setTitle("Models");
-                                
-                grid.add(chart, 0, 0);
-                statisticsPanel.setScene(scene);
-            }
-        });		
+		
 		
 		productsPanel.setLayout(new GridLayout (0,4));
+		salesPanel.setLayout(new GridLayout (0,4));
+
+		productsPanel.setBackground(Color.WHITE);
+		salesPanel.setBackground(Color.WHITE);
+		researchPanel.setBackground(Color.WHITE);
 		
 		tabbedPanel.add("Products", scrollProducts);
 		tabbedPanel.add("Sales", scrollSales);
@@ -314,6 +325,7 @@ public class Menu {
 	 */
 	private void initButtons() {
 		
+		initPiechart();
 		addProduct.setBackground(Color.WHITE);
 		removeProduct.setBackground(Color.WHITE);
 		searchProduct.setBackground(Color.WHITE);
@@ -384,8 +396,30 @@ public class Menu {
 		salesPanel.add(tmp);
 		PdfGenerator receipt = new PdfGenerator(sale);
 		
-//    	pieChartData.add(new PieChart.Data(sale.getModel(), 1));
-//    	mostWantedModel.merge(sale.getModel(), 1, Integer::sum);
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	modelMap.merge(sale.getModel(), 1, Integer::sum);
+	        	customerMap.merge(sale.getCustomer(), 1, Integer::sum);
+	        	categoryMap.merge(sale.getCategory(), 1, Integer::sum);
+	        	
+	        	pieChartModelData.clear();
+	        	pieChartCustomerData.clear();
+	        	pieChartCategoryData.clear();
+	        
+	        	for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
+                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
+                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
+                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+	        }
+	   });
 		
 		salesPanel.revalidate();
 		salesPanel.repaint();			
@@ -401,6 +435,48 @@ public class Menu {
 		researchPanel.repaint();
 	}
 	
+	private void initPiechart() {
+		Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	GridPane grid = new GridPane();
+            	Scene scene = new Scene(grid, 800, 0);
+                
+                modelMap = storage.mostWantedFromSale("model");
+                categoryMap = storage.mostWantedFromSale("category");
+                customerMap = storage.mostWantedFromSale("customer");
+                
+                for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
+                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
+                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
+                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                chartModel = new PieChart(pieChartModelData);
+                chartModel.setTitle("Models");
+                
+                chartCategory = new PieChart(pieChartCategoryData);
+                chartCategory.setTitle("Categories");
+                
+                chartCustomer = new PieChart(pieChartCustomerData);
+                chartCustomer.setTitle("Customers");
+                
+                grid.add(chartModel, 0, 0);
+                grid.add(chartCategory, 800, 0);
+                grid.add(chartCustomer, 400, 800);
+                
+                statisticsPanel.setScene(scene);
+            }
+        });
+	}
+	
+	
 	
 
 }
+

@@ -3,7 +3,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javafx.util.Pair;
 import products.Product;
 import products.Sale;
 

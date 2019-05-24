@@ -7,7 +7,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 public class MenuBarCategory extends JMenuBar {
-	
+
+	private static final long serialVersionUID = -7528736883721681264L;
+
 	JMenu category = new JMenu("Select category: "); 
 
 	JMenuItem cellulari = new JMenuItem("Cellulari"); 

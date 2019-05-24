@@ -4,13 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
-import javax.swing.JSplitPane;
-
-import extras.PdfGenerator;
-import graphic.InfoPopupSell;
 import manager.Menu;
 import products.Product;
-import products.Sale;
 
 public class BuyProductFromCatalogAction implements ActionListener {
 

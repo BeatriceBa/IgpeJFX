@@ -5,13 +5,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
-import javax.swing.JSplitPane;
-import extras.PdfGenerator;
 import graphic.InfoPopupSearch;
-import graphic.InfoPopupSell;
 import manager.Menu;
 import products.Product;
-import products.Sale;
 
 public class SearchProductAction implements ActionListener {
 	

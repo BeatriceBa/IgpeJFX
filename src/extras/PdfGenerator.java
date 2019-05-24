@@ -1,30 +1,17 @@
 package extras;
 
-//import java.awt.Image;
-//import java.awt.image.BufferedImage;
-import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-
-import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chapter;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.List;
-import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -41,10 +28,6 @@ public class PdfGenerator {
 	private static Sale sale = new Sale();
     
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
-            Font.BOLD);
-	private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-            Font.NORMAL, BaseColor.RED);
-	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
             Font.BOLD);
 	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
@@ -76,11 +59,6 @@ public class PdfGenerator {
 			e.printStackTrace();
         }
     }
-	
-	public static void main (String[] args) {
-		Sale esse = new Sale();
-		PdfGenerator provazza = new PdfGenerator(esse);
-	}
 
 	private void addTitlePage() throws DocumentException, FileNotFoundException {
 		Paragraph preface = new Paragraph();
@@ -168,10 +146,8 @@ public class PdfGenerator {
 	}
 	
 	public void addEndPage() throws IOException, DocumentException {
-		Paragraph paragraph = new Paragraph();
-		
+
 		String imagePath = "./pictures/Thankyou.png";
-		Image img = Image.getInstance(imagePath);
 		
 		PdfPTable table = new PdfPTable(2);
 	    table.setWidthPercentage(100);
