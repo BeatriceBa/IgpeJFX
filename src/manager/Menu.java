@@ -6,10 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
@@ -20,18 +17,12 @@ import actionListeners.BuyProductFromCatalogAction;
 import actionListeners.RemoveProductAction;
 import actionListeners.SearchProductAction;
 import database.Database;
-import extras.PdfGenerator;
-import graphic.InfoPopupSearch;
-import graphic.InfoPopupSell;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import products.Product;
 import products.Sale;
@@ -65,9 +56,15 @@ public class Menu {
 	JButton buyProduct = new JButton(buyProductIcon);
 	
 	JFrame f = new JFrame("Storage");
+
+//	JPanel dashboard = new JPanel();
+//	JPanel numberOfSoldProduct = new JPanel();
+//	JPanel numberOfProduct = new JPanel();
+//	JPanel numberOfCustomer = new JPanel();
 	
 	//Creating the left panel who contains buttons such as add product, remove product etc..
 	JPanel leftPanel = new JPanel();
+	
 	
 	//The second half of the frame is divided into three panels: product, sales, statistics
 	JTabbedPane tabbedPanel = new JTabbedPane();
@@ -117,9 +114,7 @@ public class Menu {
 	 *  handling the hover over with mouse cursor)
 	 */
 	public Menu() {
-		
-		//f.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		
+				
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		windowWidth = dim.width;
 		windowHeight = dim.height - 30;
@@ -136,8 +131,11 @@ public class Menu {
 		initPanels();
 				
 		//Handling buttons
-		initButtons();		
+		initButtons();	
 		
+		//Handling pie chart
+		initPiechart();
+
 		//Adding the main panel (splitPanel) to the frame
 		f.add(splitPanel);
 		f.setVisible(true);
@@ -207,7 +205,6 @@ public class Menu {
 		description.setBackground(Color.WHITE);
 		photo.setBackground(Color.WHITE);
 		
-		
 		//Image resize
 		ImageIcon icon = new ImageIcon(s.getImagePath());
 		Image image = icon.getImage();
@@ -275,7 +272,6 @@ public class Menu {
 	 */
 	private void initPanels() {
 		
-		
 		productsPanel.setLayout(new GridLayout (0,4));
 		salesPanel.setLayout(new GridLayout (0,4));
 
@@ -325,7 +321,6 @@ public class Menu {
 	 */
 	private void initButtons() {
 		
-		initPiechart();
 		addProduct.setBackground(Color.WHITE);
 		removeProduct.setBackground(Color.WHITE);
 		searchProduct.setBackground(Color.WHITE);
@@ -394,7 +389,6 @@ public class Menu {
 		JSplitPane tmp = salePanelCreation(sale);
 		//Refreshing the sale panel					
 		salesPanel.add(tmp);
-		PdfGenerator receipt = new PdfGenerator(sale);
 		
 		Platform.runLater(new Runnable() {
 	        @Override
