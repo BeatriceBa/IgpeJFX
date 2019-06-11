@@ -40,7 +40,7 @@ public class BuyProductAction implements ActionListener {
 				menu.buyProduct(ip.getID());			
 			}
 			else {
-				JOptionPane.showMessageDialog(null, "Sale failed. (" + ip.getCustomer() + " are you sure the product existed?) ", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Sale failed.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

@@ -9,6 +9,8 @@ import products.Sale;
 public class Database {
 
 	static String url = "jdbc:sqlite:./db/storage.db";
+	static int charLimit = 50;
+	static double priceLimit = 1000000000;
 	
 	public Database() {
 		createNewDatabase();
@@ -69,6 +71,8 @@ public class Database {
     }
 	
 	public boolean insertSale(Integer id, String customer) {
+		if (customer.length() >= charLimit)
+			return false;
 		//Query needed to insert a sale into the storage 
 		//(has as parameters category,price and model of the sold product)
         String sale = "INSERT INTO sale(id,customer,date,category,price,model)\n"
@@ -104,7 +108,12 @@ public class Database {
         	return false;
     }
 
-	public boolean insertProduct(String  category, Double price, String model) {
+	public boolean insertProduct(String category, Double price, String model) {
+		if (model.length() >= charLimit)
+			return false;
+		if (price >= priceLimit)
+			return false;
+		
 		String prodotto = "INSERT INTO product(category,price,model)\n"
 	        		+ "VALUES\n"
 	        		+ "(\n"

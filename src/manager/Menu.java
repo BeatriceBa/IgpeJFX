@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.swing.*;
 
 import actionListeners.AddProductAction;
+import actionListeners.AddToCart;
+import actionListeners.BuyCartElements;
 import actionListeners.BuyProductAction;
 import actionListeners.BuyProductFromCatalogAction;
 import actionListeners.RemoveProductAction;
@@ -42,6 +44,7 @@ public class Menu {
 	//Products/sales lists needed to contain the products/sales in the database
 	ArrayList<Product> products = new ArrayList<Product>();
 	ArrayList<Sale> sales = new ArrayList<Sale>();
+	ArrayList<Product> cart = new ArrayList<Product>();
 	
 	//Creating icons for existing buttons
 	ImageIcon addProductIcon = new ImageIcon("pictures/icons/AddProduct.jpg");
@@ -54,13 +57,9 @@ public class Menu {
 	JButton removeProduct = new JButton(removeProductIcon);
 	JButton searchProduct = new JButton(searchProductIcon);
 	JButton buyProduct = new JButton(buyProductIcon);
+	JButton cartButton = new JButton("Cart"); 
 	
 	JFrame f = new JFrame("Storage");
-
-//	JPanel dashboard = new JPanel();
-//	JPanel numberOfSoldProduct = new JPanel();
-//	JPanel numberOfProduct = new JPanel();
-//	JPanel numberOfCustomer = new JPanel();
 	
 	//Creating the left panel who contains buttons such as add product, remove product etc..
 	JPanel leftPanel = new JPanel();
@@ -73,11 +72,13 @@ public class Menu {
 	JPanel productsPanel = new JPanel();
 	JPanel salesPanel = new JPanel();
 	JPanel researchPanel = new JPanel();
+	JPanel cartPanel = new JPanel();
 	JFXPanel statisticsPanel = new JFXPanel();
 	
 	JScrollPane scrollSales = new JScrollPane(salesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	JScrollPane scrollProducts = new JScrollPane(productsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	JScrollPane scrollStatistics = new JScrollPane(statisticsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	JScrollPane scrollCart = new JScrollPane(cartPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	JScrollPane scrollResearch = new JScrollPane(researchPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
 	//Once the "sub-panels" are created, we create the main panel, which is a splitPane
@@ -141,6 +142,63 @@ public class Menu {
 		f.setVisible(true);
 	}
 	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Create a panel for a given product in the products list.
+	 * Needed to show the details of that product. Different from productpanelcreation
+	 * because it just shows elements in the cart
+	 * @param Product p
+	 * @return JPanel overall 
+	 */
+	private JSplitPane cartPanelCreation(Product p) {
+				
+		//Overall is the complete panel, consisting of two small panels: description (which 
+		//contains info about the product) and photo (which contains the actual picture)
+		JPanel description = new JPanel();
+		JPanel photo = new JPanel();
+		JSplitPane overall = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, photo, description);
+		
+		description.setBackground(Color.WHITE);
+		photo.setBackground(Color.WHITE);
+		
+		//Resizing the image
+		ImageIcon productIcon = new ImageIcon(p.getImagePath());
+		Image image = productIcon.getImage().getScaledInstance(iconSize, iconSize, java.awt.Image.SCALE_SMOOTH);
+		productIcon = new ImageIcon(image);
+		JLabel label = new JLabel(productIcon);
+		photo.setPreferredSize(new Dimension(iconSize, iconSize));
+		photo.add(label, BorderLayout.CENTER);
+
+		//Adding descriptions
+		description.setLayout(new BoxLayout(description, BoxLayout.PAGE_AXIS));
+		JLabel id = new JLabel("ID : " + p.getId());
+		JLabel price = new JLabel("Price : €" + p.getPrice());
+		JLabel category = new JLabel("Category : " + p.getCategory());
+		JLabel model = new JLabel("Model : " + p.getModel());
+		description.add(id);
+		description.add(price);
+		description.add(category);
+		description.add(model);
+			
+		overall.setDividerLocation(iconSize);
+		overall.setEnabled(false);
+		overall.setDividerSize(0);
+		
+		//Setting the size of the panel
+		overall.setMaximumSize(new Dimension(Integer.MAX_VALUE, iconSize));
+
+		return overall;
+	}
+	
+	
+	
+	
+	
 	/**
 	 * Create a panel for a given product in the products list.
 	 * Needed to show the details of that product.
@@ -160,7 +218,9 @@ public class Menu {
 		photo.setBackground(Color.WHITE);
 		
 		JButton sell = new JButton("Sell");
+		JButton addToCart = new JButton("Cart");
 		sell.addActionListener(new BuyProductFromCatalogAction(this,p));
+		addToCart.addActionListener(new AddToCart(this,p));
 		
 		//Resizing the image
 		ImageIcon productIcon = new ImageIcon(p.getImagePath());
@@ -181,6 +241,7 @@ public class Menu {
 		description.add(category);
 		description.add(model);
 		description.add(sell);
+		description.add(addToCart);
 			
 		overall.setDividerLocation(iconSize);
 		overall.setEnabled(false);
@@ -283,6 +344,7 @@ public class Menu {
 		tabbedPanel.add("Sales", scrollSales);
 		tabbedPanel.add("Research", scrollResearch);
 		tabbedPanel.add("Statistics", scrollStatistics);
+		tabbedPanel.add("Cart", cartPanel);
 		
 		splitPanel.setDividerLocation(buttonSize);
 		splitPanel.setEnabled(false);
@@ -295,6 +357,7 @@ public class Menu {
 		leftPanel.add(removeProduct);
 		leftPanel.add(searchProduct);
 		leftPanel.add(buyProduct);	
+		leftPanel.add(cartButton);
 
 	}
 	/**
@@ -325,6 +388,7 @@ public class Menu {
 		removeProduct.setBackground(Color.WHITE);
 		searchProduct.setBackground(Color.WHITE);
 		buyProduct.setBackground(Color.WHITE);
+		cartButton.setBackground(Color.WHITE);
 
 		addProduct.setToolTipText("Add a product");
 		removeProduct.setToolTipText("Remove a product");
@@ -335,11 +399,14 @@ public class Menu {
 		removeProduct.setFocusPainted(false);
 		searchProduct.setFocusPainted(false);
 		buyProduct.setFocusPainted(false);
+		cartButton.setFocusPainted(false);
 		
 		addProduct.addActionListener(new AddProductAction(this));
 		removeProduct.addActionListener(new RemoveProductAction(this));
 		buyProduct.addActionListener(new BuyProductAction(this));
 		searchProduct.addActionListener(new SearchProductAction(this));
+		cartButton.addActionListener(new BuyCartElements(this));
+
 	}
 	
 	public Database getStorage() {
@@ -469,7 +536,27 @@ public class Menu {
         });
 	}
 	
+	public void addingProductToCart (Product p) {
+		if (cart.contains(p))
+			return;
+		
+		cart.add(p);
+		
+		JSplitPane tmp = cartPanelCreation(p);
+		cartPanel.add(tmp);
+		cartPanel.revalidate();
+		cartPanel.repaint();
+	}
 	
+	public ArrayList<Product> getCart() {
+		return cart;
+	}
+	public void emptyCart() {
+		cart.clear();
+		cartPanel.removeAll();
+		cartPanel.revalidate();
+		cartPanel.repaint();
+	}
 	
 
 }
