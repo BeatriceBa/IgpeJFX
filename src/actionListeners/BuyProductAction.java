@@ -27,14 +27,16 @@ public class BuyProductAction implements ActionListener {
 			if (menu.getStorage().insertSale(ip.getID(), ip.getCustomer())) {
 				Sale sale = menu.getStorage().getSell(ip.getID());
 				if(ip.getResult().equals("mail")) {
-					PdfGenerator pdfg = new PdfGenerator(sale);
+					PdfGenerator pdfg = new PdfGenerator();
+					pdfg.createSingleSalePdf(sale);
 					Mail mail = new Mail();
 					String receiver = sale.getCustomer();
 					mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
 				    //mail.addAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"oooooooooooooo","Plz funziona");  
 				}
 				else if(ip.getResult().equals("receipt")) {
-					PdfGenerator pdfg = new PdfGenerator(sale);
+					PdfGenerator pdfg = new PdfGenerator();
+					pdfg.createSingleSalePdf(sale);
 				}
 				JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);
 				menu.buyProduct(ip.getID());			

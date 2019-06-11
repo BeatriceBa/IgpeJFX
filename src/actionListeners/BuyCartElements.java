@@ -25,10 +25,8 @@ public class BuyCartElements implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		
 		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
-		ArrayList <String> files = new ArrayList<String>();
 		Mail mail = new Mail();
 		ArrayList <Sale> sales = new ArrayList<Sale>();
-
 		
 		if( ip.getConfirm() == 1 ) {
 			if (menu.getCart().size() == 0 ) {
@@ -43,11 +41,9 @@ public class BuyCartElements implements ActionListener {
 				if (menu.getStorage().insertSale(id, ip.getCustomer())) {
 					
 					menu.buyProduct(id);
-					files.add("./receipts/" +id+ "ID.pdf");
 
 					Sale sale = menu.getStorage().getSell(id);
 					sales.add(sale);
-				
 				}
 				
 				else {
@@ -55,12 +51,18 @@ public class BuyCartElements implements ActionListener {
 					return;
 				}
 			}
+			
+			String filepath = "./receipts/"+sales.get(0).getId()+"ID.pdf";
 			if (ip.getResult().equals("receipt")) {
-				
+				PdfGenerator pdfg = new PdfGenerator();
+				pdfg.createMultipleSalePdf(sales);
 			}
-			if (ip.getResult().equals("mail")) 
-				mail.mailWithMultipleAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",ip.getCustomer(),"Subject",files);
-				
+			else if (ip.getResult().equals("mail")) {
+				PdfGenerator pdfg = new PdfGenerator();
+				pdfg.createMultipleSalePdf(sales);
+				mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",ip.getCustomer(),"Subject",filepath);
+			}
+			
 			JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);
 			menu.emptyCart();
 			

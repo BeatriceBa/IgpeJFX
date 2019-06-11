@@ -26,7 +26,7 @@ public class PdfGenerator {
     
 	private Document document = new Document();
 	
-	private static Sale sale = new Sale();
+//	private static Sale sale = new Sale();
     
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
@@ -38,9 +38,8 @@ public class PdfGenerator {
 	private Paragraph paymentDetails;
 
 
-	public void createSingleSalePdf (Sale _sale) {
+	public void createSingleSalePdf (Sale sale) {
 		try {
-			sale = _sale;
 			filepath = "./receipts/" + sale.getId() + "ID.pdf";
 			
     		customerDetails = new Paragraph("Receipt details:\n Date: " + sale.getDate() + "\nCustomer: " + sale.getCustomer());
@@ -51,7 +50,7 @@ public class PdfGenerator {
             
 			addTitlePage();
 			addCustomerInfo();
-			createTable();
+			createTable(sale);
 			addPaymentInfo();
 			addEndPage();
             
@@ -63,17 +62,20 @@ public class PdfGenerator {
 
 	public void createMultipleSalePdf (ArrayList<Sale> sales) {
 		try {
+			double totalPrice = 0.0;
 			filepath = "./receipts/" + sales.get(0).getId() + "ID.pdf";
 			
     		customerDetails = new Paragraph("Receipt details:\n Date: " + sales.get(0).getDate() + "\nCustomer: " + sales.get(0).getCustomer());
-    		paymentDetails = new Paragraph ("Price: " + sale.getPrice());
+    		for (int i=0; i<sales.size(); i++)
+    			totalPrice += sales.get(i).getPrice();
+    		paymentDetails = new Paragraph ("Price: " + totalPrice);
 			
     		PdfWriter.getInstance(document, new FileOutputStream(filepath));
 			document.open();
             
 			addTitlePage();
 			addCustomerInfo();
-			createTable();
+			createTableMultipleOrder(sales);
 			addPaymentInfo();
 			addEndPage();
             
@@ -104,7 +106,6 @@ public class PdfGenerator {
         //As the dealer details are a class field, they just need to be added
 		customerDetails.setAlignment(Element.ALIGN_RIGHT);
 		paragraph.add(customerDetails);
-		//addEmptyLine(paragraph, 1);
 		
 		addEmptyLine(paragraph,2);
 		document.add(paragraph);
@@ -117,14 +118,13 @@ public class PdfGenerator {
         //As the dealer details are a class field, they just need to be added
 		paymentDetails.setAlignment(Element.ALIGN_RIGHT);
 		paragraph.add(paymentDetails);
-		//addEmptyLine(paragraph, 1);
 		
 		addEmptyLine(paragraph,15);
 		document.add(paragraph);
 	}
 	
 	
-	private void createTable () throws DocumentException, FileNotFoundException {
+	private void createTable (Sale sale) throws DocumentException, FileNotFoundException {
 
         PdfPTable table = new PdfPTable(3); // 3 columns.
 
@@ -148,31 +148,39 @@ public class PdfGenerator {
         document.add(table);
 
 	}
-//	
-//	private void createTable () throws DocumentException, FileNotFoundException {
-//
-//        PdfPTable table = new PdfPTable(3); // 3 columns.
-//
-//        PdfPCell c1 = new PdfPCell(new Phrase("Product ID"));
-//        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//        table.addCell(c1);
-//
-//        c1 = new PdfPCell(new Phrase("Category"));
-//        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//        table.addCell(c1);
-//
-//        c1 = new PdfPCell(new Phrase("Model"));
-//        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//        table.addCell(c1);
-//        table.setHeaderRows(1);
-//
-//        table.addCell(Integer.toString(sale.getId()));
-//        table.addCell(sale.getCategory());
-//        table.addCell(sale.getModel()); 
-//
-//        document.add(table);
-//
-//	}
+	
+	private void createTableMultipleOrder (ArrayList <Sale> sales) throws DocumentException, FileNotFoundException {
+
+        PdfPTable table = new PdfPTable(4); // 4 columns.
+
+        PdfPCell c1 = new PdfPCell(new Phrase("Product ID"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+
+        c1 = new PdfPCell(new Phrase("Category"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+
+        c1 = new PdfPCell(new Phrase("Model"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+        
+        c1 = new PdfPCell(new Phrase("Price"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+        
+        table.setHeaderRows(1);
+
+        for (int i=0; i<sales.size(); i++) {
+	        table.addCell(Integer.toString(sales.get(i).getId()));
+	        table.addCell(sales.get(i).getCategory());
+	        table.addCell(sales.get(i).getModel()); 
+	        table.addCell(Double.toString(sales.get(i).getPrice())); 
+        }
+
+        document.add(table);
+
+	}
 	
 	public static PdfPCell createImageCell(String path) throws DocumentException, IOException {
 	    Image img = Image.getInstance(path);

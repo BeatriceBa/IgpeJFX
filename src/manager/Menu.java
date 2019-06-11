@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -45,6 +47,7 @@ public class Menu {
 	ArrayList<Product> products = new ArrayList<Product>();
 	ArrayList<Sale> sales = new ArrayList<Sale>();
 	ArrayList<Product> cart = new ArrayList<Product>();
+	ArrayList<Product> research = new ArrayList<Product>();
 	
 	//Creating icons for existing buttons
 	ImageIcon addProductIcon = new ImageIcon("pictures/icons/AddProduct.jpg");
@@ -63,7 +66,6 @@ public class Menu {
 	
 	//Creating the left panel who contains buttons such as add product, remove product etc..
 	JPanel leftPanel = new JPanel();
-	
 	
 	//The second half of the frame is divided into three panels: product, sales, statistics
 	JTabbedPane tabbedPanel = new JTabbedPane();
@@ -430,10 +432,19 @@ public class Menu {
 		JLabel price = new JLabel("Price : €" + p.getPrice());
 		JLabel category = new JLabel("Category : " + p.getCategory());
 		JLabel model = new JLabel("Model : " + p.getModel());
+		JButton deleteButton = new JButton("Delete");
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				deleteFromCart(p.getId());
+			}
+		});		
+	
 		description.add(id);
 		description.add(price);
 		description.add(category);
 		description.add(model);
+		description.add(deleteButton);
 			
 		overall.setDividerLocation(iconSize);
 		overall.setEnabled(false);
@@ -475,6 +486,9 @@ public class Menu {
 		
 		productsPanel.revalidate();
 		productsPanel.repaint();
+		deleteFromCart(id);
+		deleteFromResearch(id);
+		
 	}
 	
 	/**
@@ -483,11 +497,11 @@ public class Menu {
 	 * adds the product to the salesPanel
 	 * removes the product from the productsPanel
 	 * updates the PieChart
+	 * removes the product from the cart (if it was there)
 	 * @param id
 	 */
 	public void buyProduct(Integer id) {
 		deleteProduct(id);
-		
 		//Creating a temporary sale
 		Sale sale = storage.getSell(id);
 		sale.setImagePath();
@@ -496,6 +510,9 @@ public class Menu {
 		JSplitPane tmp = salePanelCreation(sale);
 		//Refreshing the sale panel					
 		salesPanel.add(tmp);
+		
+		deleteFromCart(id);
+		deleteFromResearch(id);
 		
 		Platform.runLater(new Runnable() {
 	        @Override
@@ -532,9 +549,11 @@ public class Menu {
 	 */
 	public void searchProduct(ArrayList<Product> rs) {
 		researchPanel.removeAll();
+		research.clear();
 		for( int i = 0 ; i < rs.size(); i++ ) {
 			JSplitPane tmpPanel = productPanelCreation(rs.get(i));
 			researchPanel.add(tmpPanel);
+			research.add(rs.get(i));
 		}
 		researchPanel.revalidate();
 		researchPanel.repaint();
@@ -545,8 +564,9 @@ public class Menu {
 	 * @param p
 	 */
 	public void addingProductToCart (Product p) {
-		if (cart.contains(p))
-			return;
+		for (int i=0; i<cart.size(); i++)
+			if (cart.get(i).getId() == p.getId())
+				return;
 		
 		cart.add(p);
 		
@@ -570,6 +590,41 @@ public class Menu {
 		cartPanel.revalidate();
 		cartPanel.repaint();
 	}
+	
+	public void deleteFromCart(int id) {
+		int j=0;
+		boolean found=false;
+		for (int i=0; i<cart.size(); i++) 
+			if (cart.get(i).getId() == id ) {
+				j = i;
+				found = true;
+			}		
+		
+		if (found) {
+			cart.remove(j);
+			cartPanel.remove(j);
+			cartPanel.revalidate();
+			cartPanel.repaint();
+		}
+	}
+	
+	public void deleteFromResearch(int id) {
+		int j=0;
+		boolean found=false;
+		for (int i=0; i<research.size(); i++) 
+			if (research.get(i).getId() == id ) {
+				j = i;
+				found = true;
+			}		
+		
+		if (found) {
+			research.remove(j);
+			researchPanel.remove(j);
+			researchPanel.revalidate();
+			researchPanel.repaint();
+		}
+	}
+	
 	
 }
 
