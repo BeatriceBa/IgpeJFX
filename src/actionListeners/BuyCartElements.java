@@ -2,6 +2,7 @@ package actionListeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -24,37 +25,45 @@ public class BuyCartElements implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		
 		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
+		ArrayList <String> files = new ArrayList<String>();
+		Mail mail = new Mail();
+		ArrayList <Sale> sales = new ArrayList<Sale>();
+
 		
 		if( ip.getConfirm() == 1 ) {
+			if (menu.getCart().size() == 0 ) {
+				JOptionPane.showMessageDialog(null, "Sale failed. Are you sure the cart had any element?");
+			}
+				
 			for (int i=0; i<menu.getCart().size(); i++) {
-				if (menu.getStorage().insertSale(menu.getCart().get(i).getId(), ip.getCustomer()))
-					menu.buyProduct(menu.getCart().get(i).getId());
+				int id = menu.getCart().get(i).getId();
+				//If the sale can be executed, it creates a Sale object (to create the pdf)
+				//and keeps the info about how many and which receipts need to be sent via mail 
+				//(if the option is available).
+				if (menu.getStorage().insertSale(id, ip.getCustomer())) {
+					
+					menu.buyProduct(id);
+					files.add("./receipts/" +id+ "ID.pdf");
+
+					Sale sale = menu.getStorage().getSell(id);
+					sales.add(sale);
+				
+				}
+				
 				else {
 					JOptionPane.showMessageDialog(null, "Sale failed. Did you insert customer's email?");
 					return;
 				}
 			}
+			if (ip.getResult().equals("receipt")) {
+				
+			}
+			if (ip.getResult().equals("mail")) 
+				mail.mailWithMultipleAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",ip.getCustomer(),"Subject",files);
+				
 			JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);
 			menu.emptyCart();
 			
-//			if ( menu.getStorage().insertSale(product.getId(), ip.getCustomer())  ) {
-//				menu.buyProduct(product.getId());
-//				Sale sale = menu.getStorage().getSell(product.getId());
-//				if(ip.getResult().equals("mail")) {
-//					PdfGenerator pdfg = new PdfGenerator(sale);
-//					Mail mail = new Mail();
-//					String receiver = sale.getCustomer();
-//					mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
-//				    //mail.addAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"oooooooooooooo","Plz funziona");  
-//				}
-//				else if(ip.getResult().equals("receipt")) {
-//					PdfGenerator pdfg = new PdfGenerator(sale);
-//				}
-//				
-//				JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);
-//			}	
-//			else 
-//				JOptionPane.showMessageDialog(null, "Sale failed. Did you insert customer's email?");
 		}
 		
 	}

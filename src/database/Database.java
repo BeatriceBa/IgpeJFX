@@ -73,6 +73,8 @@ public class Database {
 	public boolean insertSale(Integer id, String customer) {
 		if (customer.length() >= charLimit)
 			return false;
+		if (customer.equals(""))
+			return false;
 		//Query needed to insert a sale into the storage 
 		//(has as parameters category,price and model of the sold product)
         String sale = "INSERT INTO sale(id,customer,date,category,price,model)\n"
@@ -110,6 +112,8 @@ public class Database {
 
 	public boolean insertProduct(String category, Double price, String model) {
 		if (model.length() >= charLimit)
+			return false;
+		if (model.equals(""))
 			return false;
 		if (price >= priceLimit)
 			return false;

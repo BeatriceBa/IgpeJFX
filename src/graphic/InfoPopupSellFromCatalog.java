@@ -74,7 +74,7 @@ public class InfoPopupSellFromCatalog extends InfoPopup {
 	public String getCustomer() {
 		if (!(textField1.getText().equals("")))
 			return textField1.getText();
-		return "InfoNotAvailable";
+		return "";
 	}
 	
 	public String getResult() {

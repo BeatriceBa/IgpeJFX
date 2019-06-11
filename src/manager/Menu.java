@@ -107,6 +107,7 @@ public class Menu {
 		
 		Menu mainmenu = new Menu();
 	}
+	
 	/**
 	 * Default constructor. Sets:
 	 * -graphic components (frame and panels) 
@@ -142,63 +143,159 @@ public class Menu {
 		f.setVisible(true);
 	}
 	
-	
-	
-	
-	
-	
-	
 	/**
-	 * Create a panel for a given product in the products list.
-	 * Needed to show the details of that product. Different from productpanelcreation
-	 * because it just shows elements in the cart
-	 * @param Product p
-	 * @return JPanel overall 
+	 * Does the basic stuff for synchronizing products and sales list with the storage:
+	 * -gets all the products/sales in the database with getProducts()/getSales() function 
+	 * (for further details check the documentation on database.java file)
+	 * -for each product/sale creates a panel (using productPanelCreation() function) and adds it
+	 *  to the productsPanel/salesPanel
 	 */
-	private JSplitPane cartPanelCreation(Product p) {
+	private void initLists() {
+		
+		//List of products already in storage needs to be updated at every start
+		products = storage.getProducts();
+		sales = storage.getSales();
 				
-		//Overall is the complete panel, consisting of two small panels: description (which 
-		//contains info about the product) and photo (which contains the actual picture)
-		JPanel description = new JPanel();
-		JPanel photo = new JPanel();
-		JSplitPane overall = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, photo, description);
-		
-		description.setBackground(Color.WHITE);
-		photo.setBackground(Color.WHITE);
-		
-		//Resizing the image
-		ImageIcon productIcon = new ImageIcon(p.getImagePath());
-		Image image = productIcon.getImage().getScaledInstance(iconSize, iconSize, java.awt.Image.SCALE_SMOOTH);
-		productIcon = new ImageIcon(image);
-		JLabel label = new JLabel(productIcon);
-		photo.setPreferredSize(new Dimension(iconSize, iconSize));
-		photo.add(label, BorderLayout.CENTER);
+		for(int i = 0; i < products.size(); i++) {
+			//Creating a panel for each product in the list
+			JSplitPane tmp = productPanelCreation(products.get(i));
+			//Adding the product panel to the actual panel
+			productsPanel.add(tmp);
+		}
+				
+		for (int i = 0; i < sales.size(); i++) {
+			//Creating a panel for each sale in the list
+			JSplitPane tmp = salePanelCreation(sales.get(i));
+			//Adding the sale panel to the actual panel
+			salesPanel.add(tmp);
+		}		
+	}
 
-		//Adding descriptions
-		description.setLayout(new BoxLayout(description, BoxLayout.PAGE_AXIS));
-		JLabel id = new JLabel("ID : " + p.getId());
-		JLabel price = new JLabel("Price : €" + p.getPrice());
-		JLabel category = new JLabel("Category : " + p.getCategory());
-		JLabel model = new JLabel("Model : " + p.getModel());
-		description.add(id);
-		description.add(price);
-		description.add(category);
-		description.add(model);
-			
-		overall.setDividerLocation(iconSize);
-		overall.setEnabled(false);
-		overall.setDividerSize(0);
+	/**
+	 * Sets various parameters for each panel.
+	 */
+	private void initPanels() {
 		
-		//Setting the size of the panel
-		overall.setMaximumSize(new Dimension(Integer.MAX_VALUE, iconSize));
+		productsPanel.setLayout(new GridLayout (0,4));
+		salesPanel.setLayout(new GridLayout (0,4));
 
-		return overall;
+		productsPanel.setBackground(Color.WHITE);
+		salesPanel.setBackground(Color.WHITE);
+		researchPanel.setBackground(Color.WHITE);
+		
+		tabbedPanel.add("Products", scrollProducts);
+		tabbedPanel.add("Sales", scrollSales);
+		tabbedPanel.add("Research", scrollResearch);
+		tabbedPanel.add("Statistics", scrollStatistics);
+		tabbedPanel.add("Cart", cartPanel);
+		
+		splitPanel.setDividerLocation(buttonSize);
+		splitPanel.setEnabled(false);
+		splitPanel.setDividerSize(0);
+
+		leftPanel.setLayout(new GridLayout(5, 1));
+		leftPanel.setBackground(Color.white);
+	
+		leftPanel.add(addProduct);
+		leftPanel.add(removeProduct);
+		leftPanel.add(searchProduct);
+		leftPanel.add(buyProduct);	
+		leftPanel.add(cartButton);
+
 	}
 	
+	/**
+	 * Initializes buttons:
+	 * -handles the hovering over with mouse cursor with setToolTipText
+	 * -to avoid the not aestethically pleasing square when a button has the focused, setFocusPainted is false
+	 * -overrides actionListeners for each of the buttons:
+	 *  ° addProduct: whenever the addProduct button is clicked, an InfoPopupProduct is shown (for futher
+	 *                detail check the documentation on InfoPopupProduct.java file) and the user needs 
+	 *                to insert informations on the product that needs to be added to the database.
+	 *                In case of a missing or uncorrect field, a popup warns the user that the 
+	 *                input for that specific field is not valid.
+	 *                In case of multiple missing or uncorrect fields, a popup warns the user about 
+	 *                the first not valid field.
+	 * ° removeProduct: whenever the removeProduct button is clicked, a popup is displayed and the user
+	 * 			        has to insert the ID of the product that needs to be removed.
+	 *                  If the user's input is not valid, a popup is shown
+	 * ° buyProduct: whenever the buyProduct button is clicked, a popup shows up asking for the ID
+	 *               of the product that needs to be sold.
+	 *               A sale can be considered not valid if the id inserted does not correspond to an existing 
+	 *               product.
+	 * ° searchProduct: whenever the buyProduct is clicked a popup is displayed and the user has to insert 
+	 *                  both the parameter of the search and the value to be searched.
+	 */
+	private void initButtons() {
+		
+		addProduct.setBackground(Color.WHITE);
+		removeProduct.setBackground(Color.WHITE);
+		searchProduct.setBackground(Color.WHITE);
+		buyProduct.setBackground(Color.WHITE);
+		cartButton.setBackground(Color.WHITE);
+
+		addProduct.setToolTipText("Add a product");
+		removeProduct.setToolTipText("Remove a product");
+		searchProduct.setToolTipText("Search a product");
+		buyProduct.setToolTipText("Buy a product");
+		
+		addProduct.setFocusPainted(false);
+		removeProduct.setFocusPainted(false);
+		searchProduct.setFocusPainted(false);
+		buyProduct.setFocusPainted(false);
+		cartButton.setFocusPainted(false);
+		
+		addProduct.addActionListener(new AddProductAction(this));
+		removeProduct.addActionListener(new RemoveProductAction(this));
+		buyProduct.addActionListener(new BuyProductAction(this));
+		searchProduct.addActionListener(new SearchProductAction(this));
+		cartButton.addActionListener(new BuyCartElements(this));
+	}
 	
-	
-	
-	
+	/**
+	 * Initializes the PieChart with the already existing products in the sales table.
+	 * As it is a JavaFX component, it is added onto a JFXPanel
+	 */
+	private void initPiechart() {
+		Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	GridPane grid = new GridPane();
+            	Scene scene = new Scene(grid, 800, 0);
+                
+                modelMap = storage.mostWantedFromSale("model");
+                categoryMap = storage.mostWantedFromSale("category");
+                customerMap = storage.mostWantedFromSale("customer");
+                
+                for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
+                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
+                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                
+                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
+                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                }
+                chartModel = new PieChart(pieChartModelData);
+                chartModel.setTitle("Models");
+                
+                chartCategory = new PieChart(pieChartCategoryData);
+                chartCategory.setTitle("Categories");
+                
+                chartCustomer = new PieChart(pieChartCustomerData);
+                chartCustomer.setTitle("Customers");
+                
+                grid.add(chartModel, 0, 0);
+                grid.add(chartCategory, 800, 0);
+                grid.add(chartCustomer, 400, 800);
+                
+                statisticsPanel.setScene(scene);
+            }
+        });
+	}
+
 	/**
 	 * Create a panel for a given product in the products list.
 	 * Needed to show the details of that product.
@@ -252,6 +349,7 @@ public class Menu {
 
 		return overall;
 	}
+	
 	/**
 	 * Same as productPanelCreation, with a sale object
 	 * @param Sale s
@@ -299,120 +397,54 @@ public class Menu {
 		
 		return overall;
 	}
+	
 	/**
-	 * Does the basic stuff for synchronizing products and sales list with the storage:
-	 * -gets all the products/sales in the database with getProducts()/getSales() function 
-	 * (for further details check the documentation on database.java file)
-	 * -for each product/sale creates a panel (using productPanelCreation() function) and adds it
-	 *  to the productsPanel/salesPanel
+	 * Create a panel for a given product in the cart list.
+	 * Needed to show the details of that product. Different from productpanelcreation
+	 * because it just shows elements in the cart
+	 * @param Product p
+	 * @return JPanel overall 
 	 */
-	private void initLists() {
-		
-		//List of products already in storage needs to be updated at every start
-		products = storage.getProducts();
-		sales = storage.getSales();
+	private JSplitPane cartPanelCreation(Product p) {
 				
-		for(int i = 0; i < products.size(); i++) {
-			//Creating a panel for each product in the list
-			JSplitPane tmp = productPanelCreation(products.get(i));
-			//Adding the product panel to the actual panel
-			productsPanel.add(tmp);
-		}
-				
-		for (int i = 0; i < sales.size(); i++) {
-			//Creating a panel for each sale in the list
-			JSplitPane tmp = salePanelCreation(sales.get(i));
-			//Adding the sale panel to the actual panel
-			salesPanel.add(tmp);
-		}		
+		//Overall is the complete panel, consisting of two small panels: description (which 
+		//contains info about the product) and photo (which contains the actual picture)
+		JPanel description = new JPanel();
+		JPanel photo = new JPanel();
+		JSplitPane overall = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, photo, description);
+		
+		description.setBackground(Color.WHITE);
+		photo.setBackground(Color.WHITE);
+		
+		//Resizing the image
+		ImageIcon productIcon = new ImageIcon(p.getImagePath());
+		Image image = productIcon.getImage().getScaledInstance(iconSize, iconSize, java.awt.Image.SCALE_SMOOTH);
+		productIcon = new ImageIcon(image);
+		JLabel label = new JLabel(productIcon);
+		photo.setPreferredSize(new Dimension(iconSize, iconSize));
+		photo.add(label, BorderLayout.CENTER);
+
+		//Adding descriptions
+		description.setLayout(new BoxLayout(description, BoxLayout.PAGE_AXIS));
+		JLabel id = new JLabel("ID : " + p.getId());
+		JLabel price = new JLabel("Price : €" + p.getPrice());
+		JLabel category = new JLabel("Category : " + p.getCategory());
+		JLabel model = new JLabel("Model : " + p.getModel());
+		description.add(id);
+		description.add(price);
+		description.add(category);
+		description.add(model);
+			
+		overall.setDividerLocation(iconSize);
+		overall.setEnabled(false);
+		overall.setDividerSize(0);
+		
+		//Setting the size of the panel
+		overall.setMaximumSize(new Dimension(Integer.MAX_VALUE, iconSize));
+
+		return overall;
 	}
-	
-    
-	/**
-	 * Sets various parameters for each panel.
-	 */
-	private void initPanels() {
 		
-		productsPanel.setLayout(new GridLayout (0,4));
-		salesPanel.setLayout(new GridLayout (0,4));
-
-		productsPanel.setBackground(Color.WHITE);
-		salesPanel.setBackground(Color.WHITE);
-		researchPanel.setBackground(Color.WHITE);
-		
-		tabbedPanel.add("Products", scrollProducts);
-		tabbedPanel.add("Sales", scrollSales);
-		tabbedPanel.add("Research", scrollResearch);
-		tabbedPanel.add("Statistics", scrollStatistics);
-		tabbedPanel.add("Cart", cartPanel);
-		
-		splitPanel.setDividerLocation(buttonSize);
-		splitPanel.setEnabled(false);
-		splitPanel.setDividerSize(0);
-
-		leftPanel.setLayout(new GridLayout(5, 1));
-		leftPanel.setBackground(Color.white);
-	
-		leftPanel.add(addProduct);
-		leftPanel.add(removeProduct);
-		leftPanel.add(searchProduct);
-		leftPanel.add(buyProduct);	
-		leftPanel.add(cartButton);
-
-	}
-	/**
-	 * Initializes buttons:
-	 * -handles the hovering over with mouse cursor with setToolTipText
-	 * -to avoid the not aestethically pleasing square when a button has the focused, setFocusPainted is false
-	 * -overrides actionListeners for each of the buttons:
-	 *  ° addProduct: whenever the addProduct button is clicked, an InfoPopupProduct is shown (for futher
-	 *                detail check the documentation on InfoPopupProduct.java file) and the user needs 
-	 *                to insert informations on the product that needs to be added to the database.
-	 *                In case of a missing or uncorrect field, a popup warns the user that the 
-	 *                input for that specific field is not valid.
-	 *                In case of multiple missing or uncorrect fields, a popup warns the user about 
-	 *                the first not valid field.
-	 * ° removeProduct: whenever the removeProduct button is clicked, a popup is displayed and the user
-	 * 			        has to insert the ID of the product that needs to be removed.
-	 *                  If the user's input is not valid, a popup is shown
-	 * ° buyProduct: whenever the buyProduct button is clicked, a popup shows up asking for the ID
-	 *               of the product that needs to be sold.
-	 *               A sale can be considered not valid if the id inserted does not correspond to an existing 
-	 *               product.
-	 * ° searchProduct: whenever the buyProduct is clicked a popup is displayed and the user has to insert 
-	 *                  both the parameter of the search and the value to be searched.
-	 */
-	private void initButtons() {
-		
-		addProduct.setBackground(Color.WHITE);
-		removeProduct.setBackground(Color.WHITE);
-		searchProduct.setBackground(Color.WHITE);
-		buyProduct.setBackground(Color.WHITE);
-		cartButton.setBackground(Color.WHITE);
-
-		addProduct.setToolTipText("Add a product");
-		removeProduct.setToolTipText("Remove a product");
-		searchProduct.setToolTipText("Search a product");
-		buyProduct.setToolTipText("Buy a product");
-		
-		addProduct.setFocusPainted(false);
-		removeProduct.setFocusPainted(false);
-		searchProduct.setFocusPainted(false);
-		buyProduct.setFocusPainted(false);
-		cartButton.setFocusPainted(false);
-		
-		addProduct.addActionListener(new AddProductAction(this));
-		removeProduct.addActionListener(new RemoveProductAction(this));
-		buyProduct.addActionListener(new BuyProductAction(this));
-		searchProduct.addActionListener(new SearchProductAction(this));
-		cartButton.addActionListener(new BuyCartElements(this));
-
-	}
-	
-	public Database getStorage() {
-		return storage;
-	}
-	
 	/**
 	 * Creates and adds a panel for the given product p
 	 * @param product
@@ -445,6 +477,14 @@ public class Menu {
 		productsPanel.repaint();
 	}
 	
+	/**
+	 * Sells the product with the given id (just graphically, as it is already handled logically by 
+	 * the Database class):
+	 * adds the product to the salesPanel
+	 * removes the product from the productsPanel
+	 * updates the PieChart
+	 * @param id
+	 */
 	public void buyProduct(Integer id) {
 		deleteProduct(id);
 		
@@ -486,6 +526,10 @@ public class Menu {
 		salesPanel.repaint();			
 	}
 	
+	/**
+	 * Paints on the researchPanel the result of the search made on the database
+	 * @param rs
+	 */
 	public void searchProduct(ArrayList<Product> rs) {
 		researchPanel.removeAll();
 		for( int i = 0 ; i < rs.size(); i++ ) {
@@ -496,46 +540,10 @@ public class Menu {
 		researchPanel.repaint();
 	}
 	
-	private void initPiechart() {
-		Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	GridPane grid = new GridPane();
-            	Scene scene = new Scene(grid, 800, 0);
-                
-                modelMap = storage.mostWantedFromSale("model");
-                categoryMap = storage.mostWantedFromSale("category");
-                customerMap = storage.mostWantedFromSale("customer");
-                
-                for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
-                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
-                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
-                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                chartModel = new PieChart(pieChartModelData);
-                chartModel.setTitle("Models");
-                
-                chartCategory = new PieChart(pieChartCategoryData);
-                chartCategory.setTitle("Categories");
-                
-                chartCustomer = new PieChart(pieChartCustomerData);
-                chartCustomer.setTitle("Customers");
-                
-                grid.add(chartModel, 0, 0);
-                grid.add(chartCategory, 800, 0);
-                grid.add(chartCustomer, 400, 800);
-                
-                statisticsPanel.setScene(scene);
-            }
-        });
-	}
-	
+	/**
+	 * Adds the given product to the cart list and the cart panel
+	 * @param p
+	 */
 	public void addingProductToCart (Product p) {
 		if (cart.contains(p))
 			return;
@@ -548,9 +556,14 @@ public class Menu {
 		cartPanel.repaint();
 	}
 	
+	public Database getStorage() {
+		return storage;
+	}
+	
 	public ArrayList<Product> getCart() {
 		return cart;
 	}
+	
 	public void emptyCart() {
 		cart.clear();
 		cartPanel.removeAll();
@@ -558,6 +571,5 @@ public class Menu {
 		cartPanel.repaint();
 	}
 	
-
 }
 

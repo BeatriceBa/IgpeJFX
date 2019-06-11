@@ -28,7 +28,7 @@ public class BuyProductFromCatalogAction implements ActionListener {
 		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
 		
 		if( ip.getConfirm() == 1 ) {
-			if ( menu.getStorage().insertSale(product.getId(), ip.getCustomer())  ) {
+			if ( menu.getStorage().insertSale(product.getId(), ip.getCustomer())) {
 				menu.buyProduct(product.getId());
 				Sale sale = menu.getStorage().getSell(product.getId());
 				if(ip.getResult().equals("mail")) {
