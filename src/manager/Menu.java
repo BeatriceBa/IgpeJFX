@@ -21,6 +21,7 @@ import actionListeners.BuyProductFromCatalogAction;
 import actionListeners.RemoveProductAction;
 import actionListeners.SearchProductAction;
 import database.Database;
+import graphic.DashboardPanel;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -75,6 +76,7 @@ public class Menu {
 	JPanel salesPanel = new JPanel();
 	JPanel researchPanel = new JPanel();
 	JPanel cartPanel = new JPanel();
+	DashboardPanel dashboardPanel = new DashboardPanel();
 	JFXPanel statisticsPanel = new JFXPanel();
 	
 	JScrollPane scrollSales = new JScrollPane(salesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -107,6 +109,7 @@ public class Menu {
 			System.out.println("WHOPSIE. Something went wrong with Nimbus LaF.");
 		}
 		
+		@SuppressWarnings("unused")
 		Menu mainmenu = new Menu();
 	}
 	
@@ -131,14 +134,14 @@ public class Menu {
 		//Handles sales, products, showSales and showProducts lists, need to be always synchronized with storage
 		initLists();		
 		
+		//Handling pie chart
+		initPiechart();
+		
 		//Handling panel
 		initPanels();
 				
 		//Handling buttons
 		initButtons();	
-		
-		//Handling pie chart
-		initPiechart();
 
 		//Adding the main panel (splitPanel) to the frame
 		f.add(splitPanel);
@@ -180,11 +183,15 @@ public class Menu {
 		
 		productsPanel.setLayout(new GridLayout (0,4));
 		salesPanel.setLayout(new GridLayout (0,4));
+		
+		dashboardPanel.init(products.size(), sales.size(), 0);
 
+		
 		productsPanel.setBackground(Color.WHITE);
 		salesPanel.setBackground(Color.WHITE);
 		researchPanel.setBackground(Color.WHITE);
 		
+		tabbedPanel.add("Dashboard", dashboardPanel);
 		tabbedPanel.add("Products", scrollProducts);
 		tabbedPanel.add("Sales", scrollSales);
 		tabbedPanel.add("Research", scrollResearch);
@@ -585,10 +592,12 @@ public class Menu {
 	}
 	
 	public void emptyCart() {
-		cart.clear();
-		cartPanel.removeAll();
-		cartPanel.revalidate();
-		cartPanel.repaint();
+		if (!cart.isEmpty()) {
+			cart.clear(); 
+			cartPanel.removeAll();
+			cartPanel.revalidate();
+			cartPanel.repaint();
+		}
 	}
 	
 	public void deleteFromCart(int id) {
@@ -625,6 +634,9 @@ public class Menu {
 		}
 	}
 	
+	public void changeToCartTab () {
+		tabbedPanel.setSelectedIndex(5);
+	}
 	
 }
 

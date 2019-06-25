@@ -32,7 +32,6 @@ public class BuyProductAction implements ActionListener {
 					Mail mail = new Mail();
 					String receiver = sale.getCustomer();
 					mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
-				    //mail.addAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"oooooooooooooo","Plz funziona");  
 				}
 				else if(ip.getResult().equals("receipt")) {
 					PdfGenerator pdfg = new PdfGenerator();

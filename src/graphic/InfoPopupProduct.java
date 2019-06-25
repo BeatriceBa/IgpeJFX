@@ -9,7 +9,7 @@ public class InfoPopupProduct extends InfoPopup {
 
 	JTextField textField2 = new JTextField(20);
 	MenuBarCategory menuBar = new MenuBarCategory(); 	 
-	
+	MenuBarQuantity menuBarQuantity = new MenuBarQuantity();
 	
 	public InfoPopupProduct() {
 		tmpPanel.setLayout(b);
@@ -19,6 +19,9 @@ public class InfoPopupProduct extends InfoPopup {
 
         menuBar.setMinimumSize(new Dimension(500,50));
         menuBar.setMaximumSize(new Dimension(500,50));
+        
+        menuBarQuantity.setMinimumSize(new Dimension(500,50));
+        menuBarQuantity.setMaximumSize(new Dimension(500,50));
         tmpPanel.add(menuBar);
 		
 		tmpPanel.add(new JLabel("Price :"));
@@ -26,6 +29,9 @@ public class InfoPopupProduct extends InfoPopup {
 		
 		tmpPanel.add(new JLabel("Model :"));
 		tmpPanel.add(textField2);
+		
+		tmpPanel.add(new JLabel("Quantity :"));
+		tmpPanel.add(menuBarQuantity);
 		
 		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Add", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
@@ -56,5 +62,9 @@ public class InfoPopupProduct extends InfoPopup {
 	
 	public String getModel() {
 		return textField2.getText();
+	}
+	
+	public String getQuantity() {
+		return menuBarQuantity.getQuantity();
 	}
 }

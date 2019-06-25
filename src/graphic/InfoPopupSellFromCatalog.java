@@ -2,20 +2,16 @@ package graphic;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 public class InfoPopupSellFromCatalog extends InfoPopup {
 	
 	JCheckBox mail = new JCheckBox("Email with receipt");
 	JCheckBox receipt = new JCheckBox("Receipt");
 	JCheckBox none = new JCheckBox("None");
-	String result = "";
-	
-	
+	String result = "none";
 	
 	public InfoPopupSellFromCatalog() {
 		tmpPanel.setLayout(b);
@@ -24,18 +20,21 @@ public class InfoPopupSellFromCatalog extends InfoPopup {
 		tmpPanel.add(textField1);
 		
 		
-		tmpPanel.add(new JLabel("Choose one of the following :"));
+		tmpPanel.add(new JLabel("Choose an option:"));
 		tmpPanel.add(mail);
 		tmpPanel.add(receipt);
-		tmpPanel.add(none);
 		
 		mail.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				if ( arg0.getStateChange() == 1) {
+				if ( arg0.getStateChange() == ItemEvent.SELECTED) {
 					result = "mail";
 					receipt.setSelected(false);
 					none.setSelected(false);
+				}
+				else if ( arg0.getStateChange() == ItemEvent.DESELECTED) {
+					result = "none";
+					mail.setSelected(false);
 				}
 			}
 		});
@@ -43,20 +42,13 @@ public class InfoPopupSellFromCatalog extends InfoPopup {
 		receipt.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				if ( arg0.getStateChange() == 1) {
+				if ( arg0.getStateChange() == ItemEvent.SELECTED) {
 					result = "receipt";
 					none.setSelected(false);
 					mail.setSelected(false);
 				}
-			}
-		});
-		
-		none.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {
-				if(arg0.getStateChange() == 1) {
+				else if ( arg0.getStateChange() == ItemEvent.DESELECTED) {
 					result = "none";
-					mail.setSelected(false);
 					receipt.setSelected(false);
 				}
 			}

@@ -47,7 +47,7 @@ public class Mail{
           } catch (MessagingException e) {throw new RuntimeException(e);}    
              
     }  
-    public static void mailWithAttachment (String from,String password,String to,String sub,String filename) {
+    public void mailWithAttachment (String from,String password,String to,String sub,String filename) {
     	//Get properties object    
         Properties props = new Properties();    
         props.put("mail.smtp.host", "smtp.gmail.com");    

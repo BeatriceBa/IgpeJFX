@@ -10,7 +10,6 @@ import extras.Mail;
 import extras.PdfGenerator;
 import graphic.InfoPopupSellFromCatalog;
 import manager.Menu;
-import products.Product;
 import products.Sale;
 
 public class BuyCartElements implements ActionListener {
@@ -23,15 +22,18 @@ public class BuyCartElements implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		menu.changeToCartTab();
+		
+		if (menu.getCart().size() == 0 ) {
+			JOptionPane.showMessageDialog(null, "Sale failed. Are you sure the cart had any element?");
+			return;
+		}
 		
 		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
 		Mail mail = new Mail();
 		ArrayList <Sale> sales = new ArrayList<Sale>();
 		
 		if( ip.getConfirm() == 1 ) {
-			if (menu.getCart().size() == 0 ) {
-				JOptionPane.showMessageDialog(null, "Sale failed. Are you sure the cart had any element?");
-			}
 				
 			for (int i=0; i<menu.getCart().size(); i++) {
 				int id = menu.getCart().get(i).getId();
