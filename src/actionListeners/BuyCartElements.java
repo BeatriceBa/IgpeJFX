@@ -10,6 +10,7 @@ import extras.Mail;
 import extras.PdfGenerator;
 import graphic.InfoPopupSellFromCatalog;
 import manager.Menu;
+import products.Customer;
 import products.Sale;
 
 public class BuyCartElements implements ActionListener {
@@ -29,18 +30,24 @@ public class BuyCartElements implements ActionListener {
 			return;
 		}
 		
-		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
+		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog(menu.getCustomers());
 		Mail mail = new Mail();
 		ArrayList <Sale> sales = new ArrayList<Sale>();
 		
+		if (ip.getCustomer().size() > 0) {
+			for (int i=0; i<ip.getCustomer().size(); i++) {
+				Customer tempCustomer = ip.getCustomer().get(i);
+				menu.getStorage().insertCustomer(tempCustomer.getEmail(), tempCustomer.getName(), tempCustomer.getSurname());
+			}
+		}
 		if( ip.getConfirm() == 1 ) {
-				
+			
 			for (int i=0; i<menu.getCart().size(); i++) {
 				int id = menu.getCart().get(i).getId();
 				//If the sale can be executed, it creates a Sale object (to create the pdf)
 				//and keeps the info about how many and which receipts need to be sent via mail 
 				//(if the option is available).
-				if (menu.getStorage().insertSale(id, ip.getCustomer())) {
+				if (menu.getStorage().insertSale(id, ip.getCustomerEMail())) {
 					
 					menu.buyProduct(id);
 
@@ -62,7 +69,7 @@ public class BuyCartElements implements ActionListener {
 			else if (ip.getResult().equals("mail")) {
 				PdfGenerator pdfg = new PdfGenerator();
 				pdfg.createMultipleSalePdf(sales);
-				mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",ip.getCustomer(),"Subject",filepath);
+				mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",ip.getCustomerEMail(),"Subject",filepath);
 			}
 			
 			JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);

@@ -29,6 +29,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.layout.GridPane;
+import products.Customer;
 import products.Product;
 import products.Sale;
 
@@ -44,11 +45,11 @@ public class Menu {
 	int buttonSize = 80;
 	int panelWidth = 400;
 	
-	//Products/sales lists needed to contain the products/sales in the database
 	ArrayList<Product> products = new ArrayList<Product>();
 	ArrayList<Sale> sales = new ArrayList<Sale>();
 	ArrayList<Product> cart = new ArrayList<Product>();
 	ArrayList<Product> research = new ArrayList<Product>();
+	ArrayList<Customer> customers = new ArrayList<Customer>();
 	
 	//Creating icons for existing buttons
 	ImageIcon addProductIcon = new ImageIcon("pictures/icons/AddProduct.jpg");
@@ -60,8 +61,7 @@ public class Menu {
 	JButton addProduct = new JButton(addProductIcon);
 	JButton removeProduct = new JButton(removeProductIcon);
 	JButton searchProduct = new JButton(searchProductIcon);
-	JButton buyProduct = new JButton(buyProductIcon);
-	JButton cartButton = new JButton("Cart"); 
+	JButton cartButton = new JButton(buyProductIcon); 
 	
 	JFrame f = new JFrame("Storage");
 	
@@ -76,7 +76,7 @@ public class Menu {
 	JPanel salesPanel = new JPanel();
 	JPanel researchPanel = new JPanel();
 	JPanel cartPanel = new JPanel();
-	DashboardPanel dashboardPanel = new DashboardPanel();
+	DashboardPanel dashboardPanel = new DashboardPanel(tabbedPanel);
 	JFXPanel statisticsPanel = new JFXPanel();
 	
 	JScrollPane scrollSales = new JScrollPane(salesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -157,9 +157,10 @@ public class Menu {
 	 */
 	private void initLists() {
 		
-		//List of products already in storage needs to be updated at every start
+		//List of items already in storage needs to be updated at every start
 		products = storage.getProducts();
 		sales = storage.getSales();
+		customers = storage.getCustomers();
 				
 		for(int i = 0; i < products.size(); i++) {
 			//Creating a panel for each product in the list
@@ -185,7 +186,6 @@ public class Menu {
 		salesPanel.setLayout(new GridLayout (0,4));
 		
 		dashboardPanel.init(products.size(), sales.size(), 0);
-
 		
 		productsPanel.setBackground(Color.WHITE);
 		salesPanel.setBackground(Color.WHITE);
@@ -208,7 +208,7 @@ public class Menu {
 		leftPanel.add(addProduct);
 		leftPanel.add(removeProduct);
 		leftPanel.add(searchProduct);
-		leftPanel.add(buyProduct);	
+//		leftPanel.add(buyProduct);	
 		leftPanel.add(cartButton);
 
 	}
@@ -228,7 +228,8 @@ public class Menu {
 	 * ° removeProduct: whenever the removeProduct button is clicked, a popup is displayed and the user
 	 * 			        has to insert the ID of the product that needs to be removed.
 	 *                  If the user's input is not valid, a popup is shown
-	 * ° buyProduct: whenever the buyProduct button is clicked, a popup shows up asking for the ID
+	 * ° buyProduct: ---FUNCTIONING BUT USELESS---
+	 * 				 whenever the buyProduct button is clicked, a popup shows up asking for the ID
 	 *               of the product that needs to be sold.
 	 *               A sale can be considered not valid if the id inserted does not correspond to an existing 
 	 *               product.
@@ -240,23 +241,19 @@ public class Menu {
 		addProduct.setBackground(Color.WHITE);
 		removeProduct.setBackground(Color.WHITE);
 		searchProduct.setBackground(Color.WHITE);
-		buyProduct.setBackground(Color.WHITE);
 		cartButton.setBackground(Color.WHITE);
 
 		addProduct.setToolTipText("Add a product");
 		removeProduct.setToolTipText("Remove a product");
 		searchProduct.setToolTipText("Search a product");
-		buyProduct.setToolTipText("Buy a product");
 		
 		addProduct.setFocusPainted(false);
 		removeProduct.setFocusPainted(false);
 		searchProduct.setFocusPainted(false);
-		buyProduct.setFocusPainted(false);
 		cartButton.setFocusPainted(false);
 		
 		addProduct.addActionListener(new AddProductAction(this));
 		removeProduct.addActionListener(new RemoveProductAction(this));
-		buyProduct.addActionListener(new BuyProductAction(this));
 		searchProduct.addActionListener(new SearchProductAction(this));
 		cartButton.addActionListener(new BuyCartElements(this));
 	}
@@ -324,7 +321,7 @@ public class Menu {
 		photo.setBackground(Color.WHITE);
 		
 		JButton sell = new JButton("Sell");
-		JButton addToCart = new JButton("Cart");
+		JButton addToCart = new JButton("Add to sale");
 		sell.addActionListener(new BuyProductFromCatalogAction(this,p));
 		addToCart.addActionListener(new AddToCart(this,p));
 		
@@ -636,6 +633,10 @@ public class Menu {
 	
 	public void changeToCartTab () {
 		tabbedPanel.setSelectedIndex(5);
+	}
+	
+	public ArrayList<Customer> getCustomers() {
+		return storage.getCustomers();
 	}
 	
 }

@@ -12,36 +12,15 @@ public class InfoPopupProduct extends InfoPopup {
 	MenuBarQuantity menuBarQuantity = new MenuBarQuantity();
 	
 	public InfoPopupProduct() {
-		tmpPanel.setLayout(b);
-
-    		
-        //menuBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,menuBar.getMinimumSize().height));
-
-        menuBar.setMinimumSize(new Dimension(500,50));
-        menuBar.setMaximumSize(new Dimension(500,50));
-        
-        menuBarQuantity.setMinimumSize(new Dimension(500,50));
-        menuBarQuantity.setMaximumSize(new Dimension(500,50));
-        tmpPanel.add(menuBar);
 		
-		tmpPanel.add(new JLabel("Price :"));
-		tmpPanel.add(textField1);
+		Object [] complexMsg = { menuBar, new JLabel("Price: "), textField1, new JLabel("Model :"),
+				textField2, "Quantity :", menuBarQuantity };
+		String [] options = {  "Cancel", "Confirm" };
 		
-		tmpPanel.add(new JLabel("Model :"));
-		tmpPanel.add(textField2);
-		
-		tmpPanel.add(new JLabel("Quantity :"));
-		tmpPanel.add(menuBarQuantity);
-		
-		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Add", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			confirm = 1;
-		} else {
-			confirm = 0;
-		}
-	}
-	
-	
+		confirm = JOptionPane.showOptionDialog(null, complexMsg, "title",
+	            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+	            options, options[0]); 
+	}	
 	
 	public String getCategory() {
 		return menuBar.getCategory();

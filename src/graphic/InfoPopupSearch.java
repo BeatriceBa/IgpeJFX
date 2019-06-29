@@ -27,9 +27,8 @@ public class InfoPopupSearch extends InfoPopup {
 	MenuBarCategory mbc = new MenuBarCategory();
 	
 	public InfoPopupSearch() {
-		
 		tmpPanel.setLayout(b);
-		
+				
         searchFor.add(category); 
     	searchFor.add(price); 
     	searchFor.add(model); 
@@ -38,7 +37,6 @@ public class InfoPopupSearch extends InfoPopup {
     	setSearch();
     		
         menuBar.add(searchFor); 
-        //menuBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,menuBar.getMinimumSize().height));
 
         menuBar.setMinimumSize(new Dimension(500,20));
         menuBar.setMaximumSize(new Dimension(500,20));
@@ -57,6 +55,8 @@ public class InfoPopupSearch extends InfoPopup {
 		} else {
 			confirm = 0;
 		}
+		
+
 	}
 	
 	public void setSearch() {

@@ -3,6 +3,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import products.Customer;
 import products.Product;
 import products.Sale;
 
@@ -47,6 +48,11 @@ public class Database {
                 + "	price real NOT NULL,\n"
                 + " model text NOT NULL\n"
                 + ");";
+        String customer = "CREATE TABLE IF NOT EXISTS customer(\n"
+        		+ " email string PRIMARY KEY,\n"
+        		+ " name string NOT NULL,\n"
+        		+ " surname string NOT NULL\n"
+        		+ ");";
         
         //Trying the connection
         try (Connection conn = DriverManager.getConnection(url);
@@ -54,6 +60,7 @@ public class Database {
             // Executing query
         	stmt.execute(sale);
         	stmt.execute(product);
+        	stmt.execute(customer);
         } catch (SQLException e) {
         	System.out.println(e.getMessage());
         }
@@ -131,6 +138,33 @@ public class Database {
 	            pstmt.setString(1, category);
 	            pstmt.setDouble(2, price);
 	            pstmt.setString(3, model);
+	            pstmt.executeUpdate();
+	
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	        }
+	        return true;
+	        
+    }
+	
+	public boolean insertCustomer(String email, String name, String surname) {
+		if (email.length() >= charLimit || name.length() >= charLimit || surname.length() >= charLimit)
+			return false;
+		
+		System.out.println("Aggiungo un customer");
+		String customer = "INSERT INTO customer(email,name,surname)\n"
+	        		+ "VALUES\n"
+	        		+ "(\n"
+	        		+ "?,\n"
+	        		+ "?,\n"
+	        		+ "?\n"
+	        		+ ");";
+	 
+	        try (Connection conn = this.connect();
+	                PreparedStatement pstmt = conn.prepareStatement(customer)) {
+	            pstmt.setString(1, email);
+	            pstmt.setString(2, name);
+	            pstmt.setString(3, surname);
 	            pstmt.executeUpdate();
 	
 	        } catch (SQLException e) {
@@ -296,13 +330,9 @@ public class Database {
     	ArrayList<Product> result = new ArrayList<Product>();
 
     	try (Connection conn = this.connect();
-                PreparedStatement pstmt  = conn.prepareStatement(showcaseProduct)
-                ){
-               	
-    			pstmt.setInt(1, id);
-    			
+                PreparedStatement pstmt  = conn.prepareStatement(showcaseProduct)){           	
+    			pstmt.setInt(1, id);			
     			ResultSet rs    = pstmt.executeQuery();
-    			// loop through the result set
 	            while (rs.next()) {
 	               	Product currentProduct = new Product(rs.getInt("id"), rs.getString("category"), rs.getDouble("price"), rs.getString("model"));
 	               	result.add(currentProduct);
@@ -351,6 +381,50 @@ public class Database {
                while (rs.next()) {
                		Product currentProduct = new Product(rs.getInt("id"), rs.getString("category"), rs.getDouble("price"), rs.getString("model"));
                		result.add(currentProduct);
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+    	return result;
+    	
+    }
+    
+    public Customer getCustomer(String email){
+    	//Gets all the products in storage
+    	String showcaseProduct = "SELECT email, name, surname FROM customer";
+    	Customer customer = new Customer();
+    	try (Connection conn = this.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(showcaseProduct)){
+               
+               // loop through the result set
+               while (rs.next()) {
+            	   if (email.equals(rs.getString("email"))) {
+               		customer.setEmail(rs.getString("email"));
+               		customer.setName(rs.getString("name"));
+               		customer.setSurname(rs.getString("surname"));
+               		return customer;
+            	   }
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+    	return customer;
+    }
+    
+    public ArrayList<Customer> getCustomers(){
+    	//Gets all the products in storage
+    	String showcaseProduct = "SELECT email, name, surname FROM customer";
+    	ArrayList<Customer> result = new ArrayList<Customer>();
+
+    	try (Connection conn = this.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(showcaseProduct)){
+               
+               // loop through the result set
+               while (rs.next()) {
+               		Customer currentCustomer = new Customer(rs.getString("email"), rs.getString("name"), rs.getString("surname"));
+               		result.add(currentCustomer);
                }
            } catch (SQLException e) {
                System.out.println(e.getMessage());
@@ -407,9 +481,35 @@ public class Database {
     	
     }
     
+    public ArrayList<Sale> getCustomerHistory (Customer customer) {
+
+    	String customerMail = customer.getEmail();
+    	ArrayList<Sale> result = new ArrayList<Sale>();
+    	String joinSaleCustomer = "SELECT id, customer, date, category, price, model "
+    			+ "FROM sale "
+    			+ "WHERE customer = ?;";
+    	
+    	try (Connection conn = this.connect();
+                PreparedStatement pstmt  = conn.prepareStatement(joinSaleCustomer)){           	
+    			pstmt.setString(1, customerMail);			
+    			ResultSet rs    = pstmt.executeQuery();
+	            while (rs.next()) {
+	            	Sale temp = new Sale(rs.getInt("id"),rs.getString("customer"),
+	            			rs.getString("date"), rs.getString("cateogry"), rs.getDouble("price"),
+	            			rs.getString("model"));
+	            }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+    	return result;
+
+    }
+    
     public int getMaximumIndex() {
     	//Function needed to fetch the newest ID (for the product list in the Menu class)
-    	String getMaxIndexProduct = "SELECT id, category, price, model FROM product WHERE id = (SELECT max(id) FROM product );";
+    	String getMaxIndexProduct = "SELECT id, category, price, model "
+    			+ "FROM product "
+    			+ "WHERE id = (SELECT max(id) FROM product );";
     	String getMaxIndexSell = "SELECT id, customer, date, category, price, model FROM sale WHERE id = (SELECT max(id) FROM sale );";
     	
     	int maxP = 0;

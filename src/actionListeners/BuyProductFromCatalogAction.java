@@ -9,6 +9,7 @@ import extras.Mail;
 import extras.PdfGenerator;
 import graphic.InfoPopupSellFromCatalog;
 import manager.Menu;
+import products.Customer;
 import products.Product;
 import products.Sale;
 
@@ -25,10 +26,17 @@ public class BuyProductFromCatalogAction implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e ) {
 		
-		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog();
-		
+		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog(menu.getCustomers());
 		if( ip.getConfirm() == 1 ) {
-			if ( menu.getStorage().insertSale(product.getId(), ip.getCustomer())) {
+			if (ip.getCustomer().size() > 0) {
+				System.out.println("size maggiore di 0");
+				for (int i=0; i<ip.getCustomer().size(); i++) {
+					Customer tempCustomer = ip.getCustomer().get(i);
+					System.out.println("for");
+					menu.getStorage().insertCustomer(tempCustomer.getEmail(), tempCustomer.getName(), tempCustomer.getSurname());
+				}
+			}
+			else if (menu.getStorage().insertSale(product.getId(), ip.getCustomerEMail())) {
 				menu.buyProduct(product.getId());
 				Sale sale = menu.getStorage().getSell(product.getId());
 				if(ip.getResult().equals("mail")) {
@@ -37,7 +45,6 @@ public class BuyProductFromCatalogAction implements ActionListener {
 					Mail mail = new Mail();
 					String receiver = sale.getCustomer();
 					mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
-				    //mail.addAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"oooooooooooooo","Plz funziona");  
 				}
 				else if(ip.getResult().equals("receipt")) {
 					PdfGenerator pdfg = new PdfGenerator();
