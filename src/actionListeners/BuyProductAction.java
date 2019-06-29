@@ -38,7 +38,7 @@ public class BuyProductAction implements ActionListener {
 					pdfg.createSingleSalePdf(sale);
 				}
 				JOptionPane.showMessageDialog(null, "Sale was successful", "Sold", JOptionPane.INFORMATION_MESSAGE);
-				menu.buyProduct(ip.getID());			
+				menu.buyProduct(ip.getID(),"single");			
 			}
 			else {
 				JOptionPane.showMessageDialog(null, "Sale failed.", "Error", JOptionPane.ERROR_MESSAGE);

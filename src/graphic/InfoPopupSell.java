@@ -61,7 +61,7 @@ public class InfoPopupSell extends InfoPopup{
 			}
 		});
 		
-		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Buy", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Sell", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			confirm = 1;
 		} else {

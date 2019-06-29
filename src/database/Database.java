@@ -497,6 +497,7 @@ public class Database {
 	            	Sale temp = new Sale(rs.getInt("id"),rs.getString("customer"),
 	            			rs.getString("date"), rs.getString("cateogry"), rs.getDouble("price"),
 	            			rs.getString("model"));
+	            	result.add(temp);
 	            }
            } catch (SQLException e) {
                System.out.println(e.getMessage());

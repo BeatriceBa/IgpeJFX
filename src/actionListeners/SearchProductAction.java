@@ -39,7 +39,9 @@ public class SearchProductAction implements ActionListener {
 				JOptionPane.showMessageDialog(null, "No products found! :( ", "Error", JOptionPane.ERROR_MESSAGE);
 			
 			else 
-				menu.searchProduct(rs);		
+				menu.searchProduct(rs);
+			
+			menu.changeToResearchTab();
 		}
 	}
 }

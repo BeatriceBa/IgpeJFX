@@ -1,6 +1,5 @@
 package graphic;
 
-import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -17,7 +16,7 @@ public class InfoPopupProduct extends InfoPopup {
 				textField2, "Quantity :", menuBarQuantity };
 		String [] options = {  "Cancel", "Confirm" };
 		
-		confirm = JOptionPane.showOptionDialog(null, complexMsg, "title",
+		confirm = JOptionPane.showOptionDialog(null, complexMsg, "Add Product",
 	            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
 	            options, options[0]); 
 	}	

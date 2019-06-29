@@ -1,24 +1,17 @@
 package graphic;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import products.Customer;
@@ -53,7 +46,7 @@ public class InfoPopupSellFromCatalog extends InfoPopup {
 
 		String options[] = { "Cancel", "Confirm" };
 
-		confirm = JOptionPane.showOptionDialog(null, complexMsg, "Sell a product",
+		confirm = JOptionPane.showOptionDialog(null, complexMsg, "Sell",
 	            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
 	            options, options[0]); 
 		

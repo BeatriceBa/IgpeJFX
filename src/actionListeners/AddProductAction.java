@@ -19,6 +19,7 @@ public class AddProductAction implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
+		menu.changeToProductTab();
 		InfoPopupProduct ip = new InfoPopupProduct();
 		
 		if (ip.getConfirm() == 1) {

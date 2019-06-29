@@ -41,24 +41,25 @@ public class BuyCartElements implements ActionListener {
 			}
 		}
 		if( ip.getConfirm() == 1 ) {
-			
+			System.out.println("Cart size: " + menu.getCart().size() );
+			for (int i=0; i<menu.getCart().size(); i++) {
+				System.out.println( menu.getCart().get(i).toString());
+			}
 			for (int i=0; i<menu.getCart().size(); i++) {
 				int id = menu.getCart().get(i).getId();
+				System.out.println("i: " + i + " id: " + id );
 				//If the sale can be executed, it creates a Sale object (to create the pdf)
 				//and keeps the info about how many and which receipts need to be sent via mail 
 				//(if the option is available).
-				if (menu.getStorage().insertSale(id, ip.getCustomerEMail())) {
-					
-					menu.buyProduct(id);
-
-					Sale sale = menu.getStorage().getSell(id);
-					sales.add(sale);
-				}
+				menu.getStorage().insertSale(id, ip.getCustomerEMail());
+				menu.buyProduct(id,"cart");
+				Sale sale = menu.getStorage().getSell(id);
+				sales.add(sale);
 				
-				else {
-					JOptionPane.showMessageDialog(null, "Sale failed. Did you insert customer's email?");
-					return;
-				}
+//				else {
+//					JOptionPane.showMessageDialog(null, "Sale failed. Did you insert customer's email?");
+//					return;
+//				}
 			}
 			
 			String filepath = "./receipts/"+sales.get(0).getId()+"ID.pdf";

@@ -19,7 +19,7 @@ public class RemoveProductAction implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = " ";
-		cmd = JOptionPane.showInputDialog("Insert product ID : ");
+		cmd = JOptionPane.showInputDialog(null, "Insert product ID : ", "Delete", JOptionPane.INFORMATION_MESSAGE);
 		
 		//If i did not click cancel
 		if (cmd != null)

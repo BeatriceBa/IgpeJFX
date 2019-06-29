@@ -25,9 +25,7 @@ public class PdfGenerator {
 	private String filepath = " ";
     
 	private Document document = new Document();
-	
-//	private static Sale sale = new Sale();
-    
+	    
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
 	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
@@ -40,6 +38,16 @@ public class PdfGenerator {
 
 	public void createSingleSalePdf (Sale sale) {
 		try {
+			
+			document = new Document();
+		    
+			catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+			smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
+		    
+			dealerDetails = new Paragraph("Chiara Passarelli \n" 
+					+  "Beatrice Baldassarre \n" 
+					+ "Rende, CS 87036",  smallBold);
+			
 			filepath = "./receipts/" + sale.getId() + "ID.pdf";
 			
     		customerDetails = new Paragraph("Receipt details:\n Date: " + sale.getDate() + "\nCustomer: " + sale.getCustomer());

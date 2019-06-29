@@ -49,7 +49,7 @@ public class InfoPopupSearch extends InfoPopup {
         tmpPanel.add(label);
 		tmpPanel.add(textField1);
 		
-		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Add", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, tmpPanel, "Search", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			confirm = 1;
 		} else {

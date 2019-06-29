@@ -29,15 +29,13 @@ public class BuyProductFromCatalogAction implements ActionListener {
 		InfoPopupSellFromCatalog ip = new InfoPopupSellFromCatalog(menu.getCustomers());
 		if( ip.getConfirm() == 1 ) {
 			if (ip.getCustomer().size() > 0) {
-				System.out.println("size maggiore di 0");
 				for (int i=0; i<ip.getCustomer().size(); i++) {
 					Customer tempCustomer = ip.getCustomer().get(i);
-					System.out.println("for");
 					menu.getStorage().insertCustomer(tempCustomer.getEmail(), tempCustomer.getName(), tempCustomer.getSurname());
 				}
 			}
 			else if (menu.getStorage().insertSale(product.getId(), ip.getCustomerEMail())) {
-				menu.buyProduct(product.getId());
+				menu.buyProduct(product.getId(),"single");
 				Sale sale = menu.getStorage().getSell(product.getId());
 				if(ip.getResult().equals("mail")) {
 					PdfGenerator pdfg = new PdfGenerator();

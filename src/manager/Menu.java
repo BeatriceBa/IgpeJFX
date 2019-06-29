@@ -9,26 +9,16 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Map;
-
 import javax.swing.*;
 
 import actionListeners.AddProductAction;
 import actionListeners.AddToCart;
 import actionListeners.BuyCartElements;
-import actionListeners.BuyProductAction;
 import actionListeners.BuyProductFromCatalogAction;
 import actionListeners.RemoveProductAction;
 import actionListeners.SearchProductAction;
 import database.Database;
 import graphic.DashboardPanel;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
-import javafx.scene.layout.GridPane;
 import products.Customer;
 import products.Product;
 import products.Sale;
@@ -36,7 +26,7 @@ import products.Sale;
 public class Menu {
 	
 	//Actual database
-	Database storage = new Database();
+	Database storage;
 	
 	//Other
 	int windowWidth;
@@ -45,64 +35,54 @@ public class Menu {
 	int buttonSize = 80;
 	int panelWidth = 400;
 	
-	ArrayList<Product> products = new ArrayList<Product>();
-	ArrayList<Sale> sales = new ArrayList<Sale>();
-	ArrayList<Product> cart = new ArrayList<Product>();
-	ArrayList<Product> research = new ArrayList<Product>();
-	ArrayList<Customer> customers = new ArrayList<Customer>();
+	ArrayList<Product> products;
+	ArrayList<Sale> sales;
+	ArrayList<Product> cart;
+	ArrayList<Product> research;
+	ArrayList<Customer> customers;
 	
 	//Creating icons for existing buttons
-	ImageIcon addProductIcon = new ImageIcon("pictures/icons/AddProduct.jpg");
-	ImageIcon removeProductIcon = new ImageIcon("pictures/icons/RemoveProduct.jpg");
-	ImageIcon searchProductIcon = new ImageIcon("pictures/icons/SearchProduct.jpg");
-	ImageIcon buyProductIcon = new ImageIcon("pictures/icons/BuyProduct.jpg");
+	ImageIcon addProductIcon;
+	ImageIcon removeProductIcon;
+	ImageIcon searchProductIcon;
+	ImageIcon buyProductIcon;
 	
 	//Creating buttons and giving them a reason to live :)
-	JButton addProduct = new JButton(addProductIcon);
-	JButton removeProduct = new JButton(removeProductIcon);
-	JButton searchProduct = new JButton(searchProductIcon);
-	JButton cartButton = new JButton(buyProductIcon); 
+	JButton addProduct;
+	JButton removeProduct;
+	JButton searchProduct;
+	JButton cartButton; 
 	
 	JFrame f = new JFrame("Storage");
 	
 	//Creating the left panel who contains buttons such as add product, remove product etc..
-	JPanel leftPanel = new JPanel();
+	JPanel leftPanel;
 	
 	//The second half of the frame is divided into three panels: product, sales, statistics
-	JTabbedPane tabbedPanel = new JTabbedPane();
+	JTabbedPane tabbedPanel;
 	
 	//Creating each tab of the tabbed pane with the option of scrolling
-	JPanel productsPanel = new JPanel();
-	JPanel salesPanel = new JPanel();
-	JPanel researchPanel = new JPanel();
-	JPanel cartPanel = new JPanel();
-	DashboardPanel dashboardPanel = new DashboardPanel(tabbedPanel);
-	JFXPanel statisticsPanel = new JFXPanel();
+	JPanel productsPanel;
+	JPanel salesPanel;
+	JPanel researchPanel;
+	JPanel cartPanel;
+	DashboardPanel dashboardPanel;
 	
-	JScrollPane scrollSales = new JScrollPane(salesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	JScrollPane scrollProducts = new JScrollPane(productsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	JScrollPane scrollStatistics = new JScrollPane(statisticsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	JScrollPane scrollCart = new JScrollPane(cartPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	JScrollPane scrollResearch = new JScrollPane(researchPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	JScrollPane scrollSales;
+	JScrollPane scrollProducts;
+	JScrollPane scrollCart;
+	JScrollPane scrollResearch;
 	
 	//Once the "sub-panels" are created, we create the main panel, which is a splitPane
-	JSplitPane splitPanel = new JSplitPane (JSplitPane.HORIZONTAL_SPLIT, leftPanel, tabbedPanel);
-	
-    ObservableList<PieChart.Data> pieChartModelData = FXCollections.observableArrayList() ;
-    Map <String,Integer> modelMap;
-    PieChart chartModel;
-    
-    ObservableList<PieChart.Data> pieChartCategoryData = FXCollections.observableArrayList() ;
-    Map <String,Integer> categoryMap;
-    PieChart chartCategory;
-    
-    ObservableList<PieChart.Data> pieChartCustomerData = FXCollections.observableArrayList() ;
-    Map <String,Integer> customerMap;
-    PieChart chartCustomer;
+	JSplitPane splitPanel;
 
 	public static void main(String[] args) {	
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			UIManager.put("nimbusBase", new Color(255, 204, 153));
+			UIManager.put("nimbusBlueGrey", new Color(255, 204, 153));
+			UIManager.put("control", Color.WHITE);
+			//UIManager.put();
 		} 
 		
 		catch (Exception e) {
@@ -121,6 +101,8 @@ public class Menu {
 	 *  handling the hover over with mouse cursor)
 	 */
 	public Menu() {
+		
+		storage = new Database();
 				
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		windowWidth = dim.width;
@@ -130,15 +112,12 @@ public class Menu {
 		f.setResizable(false);
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		//Handling panel
+		initPanels();
 						
 		//Handles sales, products, showSales and showProducts lists, need to be always synchronized with storage
 		initLists();		
-		
-		//Handling pie chart
-		initPiechart();
-		
-		//Handling panel
-		initPanels();
 				
 		//Handling buttons
 		initButtons();	
@@ -157,6 +136,12 @@ public class Menu {
 	 */
 	private void initLists() {
 		
+		products = new ArrayList<Product>();
+		sales = new ArrayList<Sale>();
+		cart = new ArrayList<Product>();
+		research = new ArrayList<Product>();
+		customers = new ArrayList<Customer>();
+		
 		//List of items already in storage needs to be updated at every start
 		products = storage.getProducts();
 		sales = storage.getSales();
@@ -174,28 +159,47 @@ public class Menu {
 			JSplitPane tmp = salePanelCreation(sales.get(i));
 			//Adding the sale panel to the actual panel
 			salesPanel.add(tmp);
-		}		
+		}	
+		
+		dashboardPanel.init(products.size(), sales.size(), customers.size());
+
 	}
 
 	/**
 	 * Sets various parameters for each panel.
 	 */
 	private void initPanels() {
+		tabbedPanel = new JTabbedPane();
 		
-		productsPanel.setLayout(new GridLayout (0,4));
-		salesPanel.setLayout(new GridLayout (0,4));
+		leftPanel = new JPanel();
+				
+		productsPanel = new JPanel();
+		salesPanel = new JPanel();
+		researchPanel = new JPanel();
+		cartPanel = new JPanel();
 		
-		dashboardPanel.init(products.size(), sales.size(), 0);
+		scrollSales = new JScrollPane(salesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollProducts = new JScrollPane(productsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollCart = new JScrollPane(cartPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollResearch = new JScrollPane(researchPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
+		splitPanel = new JSplitPane (JSplitPane.HORIZONTAL_SPLIT, leftPanel, tabbedPanel);
+		dashboardPanel = new DashboardPanel(tabbedPanel, storage);
+		
+		productsPanel.setLayout(new GridLayout (0,3));
+		salesPanel.setLayout(new GridLayout (0,3));
+		researchPanel.setLayout(new GridLayout(0,3));
+		cartPanel.setLayout(new GridLayout(0,3));
+				
 		productsPanel.setBackground(Color.WHITE);
 		salesPanel.setBackground(Color.WHITE);
 		researchPanel.setBackground(Color.WHITE);
+		cartPanel.setBackground(Color.WHITE);
 		
 		tabbedPanel.add("Dashboard", dashboardPanel);
 		tabbedPanel.add("Products", scrollProducts);
 		tabbedPanel.add("Sales", scrollSales);
 		tabbedPanel.add("Research", scrollResearch);
-		tabbedPanel.add("Statistics", scrollStatistics);
 		tabbedPanel.add("Cart", cartPanel);
 		
 		splitPanel.setDividerLocation(buttonSize);
@@ -205,12 +209,6 @@ public class Menu {
 		leftPanel.setLayout(new GridLayout(5, 1));
 		leftPanel.setBackground(Color.white);
 	
-		leftPanel.add(addProduct);
-		leftPanel.add(removeProduct);
-		leftPanel.add(searchProduct);
-//		leftPanel.add(buyProduct);	
-		leftPanel.add(cartButton);
-
 	}
 	
 	/**
@@ -228,15 +226,27 @@ public class Menu {
 	 * ° removeProduct: whenever the removeProduct button is clicked, a popup is displayed and the user
 	 * 			        has to insert the ID of the product that needs to be removed.
 	 *                  If the user's input is not valid, a popup is shown
-	 * ° buyProduct: ---FUNCTIONING BUT USELESS---
+	 * ° buyProduct: ---FUNCTIONING BUT REMOVED---
 	 * 				 whenever the buyProduct button is clicked, a popup shows up asking for the ID
 	 *               of the product that needs to be sold.
 	 *               A sale can be considered not valid if the id inserted does not correspond to an existing 
 	 *               product.
 	 * ° searchProduct: whenever the buyProduct is clicked a popup is displayed and the user has to insert 
-	 *                  both the parameter of the search and the value to be searched.
+	 *                  both the parameter of the search and the value to be searched.                
+	 * ° cartButton: whenever the cartButton is clicked, a popup is displayed and the user can enter his details and
+	 * 				 buy all the product in the "cart"
 	 */
 	private void initButtons() {
+		
+		addProductIcon = new ImageIcon("pictures/icons/AddProduct.jpg");
+		removeProductIcon = new ImageIcon("pictures/icons/RemoveProduct.jpg");
+		searchProductIcon = new ImageIcon("pictures/icons/SearchProduct.jpg");
+		buyProductIcon = new ImageIcon("pictures/icons/BuyProduct.jpg");
+		
+		addProduct = new JButton(addProductIcon);
+		removeProduct = new JButton(removeProductIcon);
+		searchProduct = new JButton(searchProductIcon);
+		cartButton = new JButton(buyProductIcon); 
 		
 		addProduct.setBackground(Color.WHITE);
 		removeProduct.setBackground(Color.WHITE);
@@ -256,51 +266,15 @@ public class Menu {
 		removeProduct.addActionListener(new RemoveProductAction(this));
 		searchProduct.addActionListener(new SearchProductAction(this));
 		cartButton.addActionListener(new BuyCartElements(this));
+		
+		leftPanel.add(addProduct);
+		leftPanel.add(removeProduct);
+		leftPanel.add(searchProduct);
+		leftPanel.add(cartButton);
 	}
 	
-	/**
-	 * Initializes the PieChart with the already existing products in the sales table.
-	 * As it is a JavaFX component, it is added onto a JFXPanel
-	 */
-	private void initPiechart() {
-		Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	GridPane grid = new GridPane();
-            	Scene scene = new Scene(grid, 800, 0);
-                
-                modelMap = storage.mostWantedFromSale("model");
-                categoryMap = storage.mostWantedFromSale("category");
-                customerMap = storage.mostWantedFromSale("customer");
-                
-                for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
-                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
-                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
-                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                chartModel = new PieChart(pieChartModelData);
-                chartModel.setTitle("Models");
-                
-                chartCategory = new PieChart(pieChartCategoryData);
-                chartCategory.setTitle("Categories");
-                
-                chartCustomer = new PieChart(pieChartCustomerData);
-                chartCustomer.setTitle("Customers");
-                
-                grid.add(chartModel, 0, 0);
-                grid.add(chartCategory, 800, 0);
-                grid.add(chartCustomer, 400, 800);
-                
-                statisticsPanel.setScene(scene);
-            }
-        });
-	}
+	
+	
 
 	/**
 	 * Create a panel for a given product in the products list.
@@ -479,8 +453,7 @@ public class Menu {
 	 * @param id
 	 */
 	public void deleteProduct(int id) {
-		//I need to find the product with given id (both productList and panelList have the same
-		//elements in the same order)
+		
 		int j = 0;
 		while(id != products.get(j).getId()) {	j++;	}
 		
@@ -490,8 +463,8 @@ public class Menu {
 		
 		productsPanel.revalidate();
 		productsPanel.repaint();
-		deleteFromCart(id);
-		deleteFromResearch(id);
+//		deleteFromCart(id);
+//		deleteFromResearch(id);
 		
 	}
 	
@@ -504,7 +477,8 @@ public class Menu {
 	 * removes the product from the cart (if it was there)
 	 * @param id
 	 */
-	public void buyProduct(Integer id) {
+	public void buyProduct(Integer id, String type) {
+		System.out.println("Buying product n " + id);
 		deleteProduct(id);
 		//Creating a temporary sale
 		Sale sale = storage.getSell(id);
@@ -515,36 +489,13 @@ public class Menu {
 		//Refreshing the sale panel					
 		salesPanel.add(tmp);
 		
-		deleteFromCart(id);
+		if (!type.equals("cart"))
+			deleteFromCart(id);
 		deleteFromResearch(id);
-		
-		Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	modelMap.merge(sale.getModel(), 1, Integer::sum);
-	        	customerMap.merge(sale.getCustomer(), 1, Integer::sum);
-	        	categoryMap.merge(sale.getCategory(), 1, Integer::sum);
-	        	
-	        	pieChartModelData.clear();
-	        	pieChartCustomerData.clear();
-	        	pieChartCategoryData.clear();
-	        
-	        	for(Map.Entry<String, Integer> entry: modelMap.entrySet()) {
-                	pieChartModelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: categoryMap.entrySet()) {
-                	pieChartCategoryData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-                
-                for(Map.Entry<String, Integer> entry: customerMap.entrySet()) {
-                	pieChartCustomerData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-                }
-	        }
-	   });
 		
 		salesPanel.revalidate();
 		salesPanel.repaint();			
+		dashboardPanel.refresh(sale);
 	}
 	
 	/**
@@ -632,7 +583,15 @@ public class Menu {
 	}
 	
 	public void changeToCartTab () {
-		tabbedPanel.setSelectedIndex(5);
+		tabbedPanel.setSelectedIndex(4);
+	}
+	
+	public void changeToProductTab() {
+		tabbedPanel.setSelectedIndex(1);
+	}
+	
+	public void changeToResearchTab() {
+		tabbedPanel.setSelectedIndex(3);
 	}
 	
 	public ArrayList<Customer> getCustomers() {
