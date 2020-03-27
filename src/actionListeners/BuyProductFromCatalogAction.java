@@ -42,7 +42,7 @@ public class BuyProductFromCatalogAction implements ActionListener {
 					pdfg.createSingleSalePdf(sale);
 					Mail mail = new Mail();
 					String receiver = sale.getCustomer();
-					mail.mailWithAttachment("beatricebaldassarre86@gmail.com","lisistrata1998",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
+					mail.mailWithAttachment("---","---",receiver,"Subject","./receipts/"+sale.getId()+"ID.pdf");
 				}
 				else if(ip.getResult().equals("receipt")) {
 					PdfGenerator pdfg = new PdfGenerator();
